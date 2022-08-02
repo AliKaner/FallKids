@@ -15,9 +15,10 @@ public class JoystickPlayerExample : MonoBehaviour
     public void FixedUpdate()
     {
         direction = Vector3.right * variableJoystick.Vertical + Vector3.back * variableJoystick.Horizontal;
-
-        if (Input.GetMouseButton(0) && direction != Vector3.zero)
+        rb.freezeRotation = true;
+        if (Input.GetMouseButton(0) && direction != Vector3.zero && GameStateManager.Instance.CurrentState != GameStates.Paint)
         {
+            rb.freezeRotation = false;
             animator.SetBool(IsWalking, true);
             rb.MovePosition(transform.position + direction * speed * Time.fixedDeltaTime);
             if (direction != Vector3.zero) transform.forward = direction;
@@ -27,9 +28,14 @@ public class JoystickPlayerExample : MonoBehaviour
             animator.SetBool(IsWalking, false);
         }
     }
-    private void OnDisable()
+
+    private void OnCollisionEnter(Collision collision)
     {
-        animator.SetBool(IsWalking, false);
+        if (collision.collider.CompareTag("Finish"))
+        {
+            animator.SetBool(IsWalking, false);
+            enabled = true;
+        }
     }
-    
+
 }
